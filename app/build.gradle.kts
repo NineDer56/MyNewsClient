@@ -92,9 +92,13 @@ dependencies {
 
     implementation(libs.coil.compose)
 
-    val sdkVersion = "2.5.1"
-    implementation("com.vk.id:vkid:${sdkVersion}")
-    implementation("com.vk.id:onetap-compose:${sdkVersion}")
+    implementation(libs.vkid)
+    implementation(libs.onetap.compose)
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    implementation(libs.logging.interceptor)
 
 
 }
