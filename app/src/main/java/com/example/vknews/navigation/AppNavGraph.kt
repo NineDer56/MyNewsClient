@@ -6,8 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import androidx.navigation.navArgument
-import com.example.vknews.domain.FeedPost
 
 @Composable
 fun AppNavGraph(
@@ -33,18 +31,18 @@ fun AppNavGraph(
                 newsFeedContent()
             }
 
-            composable(
-                route = Screen.Comments.route,
-                arguments = listOf(
-                    navArgument(Screen.KEY_FEED_POST) {
-                        type = FeedPost.NavigationType
-                    }
-                )
-            ) {
-                val feedPost = it.arguments?.getParcelable<FeedPost>(Screen.KEY_FEED_POST)
-                    ?: throw RuntimeException("arguments are null")
-                commentsContent(feedPost.id)
-            }
+//            composable(
+//                route = Screen.Comments.route,
+//                arguments = listOf(
+//                    navArgument(Screen.KEY_FEED_POST) {
+//                        type = FeedPost.NavigationType
+//                    }
+//                )
+//            ) {
+//                val feedPost = it.arguments?.getParcelable<FeedPost>(Screen.KEY_FEED_POST)
+//                    ?: throw RuntimeException("arguments are null")
+//                commentsContent(feedPost.id)
+//            }
         }
 
         composable(route = Screen.Favourite.route) {

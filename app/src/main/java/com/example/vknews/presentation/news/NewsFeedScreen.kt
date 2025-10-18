@@ -12,17 +12,26 @@ fun HomeScreen(
 
     val viewModel : NewsFeedViewModel = viewModel()
 
-    val screenState = viewModel.newsFeedScreenState.collectAsState()
+    val screenState = viewModel.newsState.collectAsState()
 
     when(val currentState = screenState.value){
-        is NewsFeedScreenState.Posts -> {
+        is NewsState.News -> {
             FeedPosts(
-                posts = currentState.posts,
+                posts = currentState.news,
                 viewModel = viewModel,
                 onCommentsClickListener = onCommentsClickListener
             )
         }
-        is NewsFeedScreenState.Initial -> {
+
+        is NewsState.Initial -> {
+            viewModel.loadNews()
+        }
+
+        is NewsState.Error -> {
+
+        }
+
+        is NewsState.Loading -> {
 
         }
     }

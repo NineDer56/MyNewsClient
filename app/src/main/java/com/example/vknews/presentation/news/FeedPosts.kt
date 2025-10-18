@@ -10,12 +10,11 @@ import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.vknews.domain.FeedPost
-import com.example.vknews.domain.StatisticsType
+import com.example.vknews.domain.news.NewsItem
 
 @Composable
 fun FeedPosts(
-    posts: List<FeedPost>,
+    posts: List<NewsItem>,
     viewModel: NewsFeedViewModel,
     onCommentsClickListener: (feedPostId: Int) -> Unit
 ) {
@@ -23,12 +22,12 @@ fun FeedPosts(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(posts, key = { it.id }) { feedPost ->
+        items(posts, key = { it.articleId }) { newsItem ->
             val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
                 confirmValueChange = { value ->
                     val isDismissed = value == SwipeToDismissBoxValue.EndToStart
                     if (isDismissed) {
-                        viewModel.deletePost(feedPost)
+                        viewModel.deleteNewsItem(newsItem)
                     }
                     return@rememberSwipeToDismissBoxState isDismissed
                 }
@@ -43,27 +42,27 @@ fun FeedPosts(
             ) {
 
                 VkPost(
-                    feedPost = feedPost,
+                    newsItem = newsItem,
                     onLikeClickListener = {
-                        viewModel.updateStatisticsItem(
-                            feedPost,
-                            StatisticsType.LIKES
-                        )
+//                        viewModel.updateStatisticsItem(
+//                            newsItem,
+//                            StatisticsType.LIKES
+//                        )
                     },
                     onCommentClickListener = {
-                        onCommentsClickListener(feedPost.id)
+//                        onCommentsClickListener(newsItem.id)
                     },
                     onRepostClickListener = {
-                        viewModel.updateStatisticsItem(
-                            feedPost,
-                            StatisticsType.REPOSTS
-                        )
+//                        viewModel.updateStatisticsItem(
+//                            newsItem,
+//                            StatisticsType.REPOSTS
+//                        )
                     },
                     onViewClickListener = {
-                        viewModel.updateStatisticsItem(
-                            feedPost,
-                            StatisticsType.VIEWS
-                        )
+//                        viewModel.updateStatisticsItem(
+//                            newsItem,
+//                            StatisticsType.VIEWS
+//                        )
                     }
                 )
             }

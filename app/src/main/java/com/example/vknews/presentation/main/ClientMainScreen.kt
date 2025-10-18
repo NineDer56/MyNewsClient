@@ -79,7 +79,7 @@ fun MainScreen() {
             newsFeedContent = {
                 HomeScreen(
                     onCommentsClickListener = {
-                        navigationState.navigateToComments(it)
+                        //navigationState.navigateToComments(it)
                     }
                 )
             },

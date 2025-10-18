@@ -1,9 +1,9 @@
 package com.example.vknews.data.mapper
 
-import com.example.vknews.data.model.NewsResponseDto
 import com.example.vknews.data.model.NewsItemDto
-import com.example.vknews.domain.news.NewsResponse
+import com.example.vknews.data.model.NewsResponseDto
 import com.example.vknews.domain.news.NewsItem
+import com.example.vknews.domain.news.NewsResponse
 
 class NewsMapper {
 
@@ -18,13 +18,16 @@ class NewsMapper {
     fun resultDtoToEntity(dto: NewsItemDto): NewsItem {
         return NewsItem(
             articleId = dto.articleId,
-            title = dto.title,
-            link = dto.link,
-            creator = dto.creator,
-            description = dto.description,
-            pubDate = dto.pubDate,
-            imageUrl = dto.imageUrl,
-            videoUrl = dto.videoUrl
+            title = dto.title ?: "",
+            link = dto.link ?: "",
+            creator = dto.creator ?: emptyList(),
+            description = dto.description ?: "",
+            pubDate = dto.pubDate ?: "",
+            imageUrl = dto.imageUrl ?: "",
+            videoUrl = dto.videoUrl ?: "",
+            sourceName = dto.sourceName ?: "",
+            sourceUrl = dto.sourceUrl ?: "",
+            sourceIcon = dto.sourceIcon ?: ""
         )
     }
 

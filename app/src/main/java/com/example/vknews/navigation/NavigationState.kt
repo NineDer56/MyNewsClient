@@ -5,7 +5,6 @@ import androidx.compose.runtime.remember
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.vknews.domain.FeedPost
 
 class NavigationState(
     val navHostController: NavHostController
@@ -20,9 +19,9 @@ class NavigationState(
         }
     }
 
-    fun navigateToComments(feedPostId : Int){
-        navHostController.navigate(Screen.Comments.getRouteWithArgs(FeedPost(id = feedPostId)))
-    }
+//    fun navigateToComments(feedPostId : Int){
+//        navHostController.navigate(Screen.Comments.getRouteWithArgs(FeedPost(id = feedPostId)))
+//    }
 }
 
 @Composable

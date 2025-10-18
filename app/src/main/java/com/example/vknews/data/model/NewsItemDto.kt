@@ -10,5 +10,9 @@ data class NewsItemDto(
     @SerializedName("description") val description : String?,
     @SerializedName("pubDate") val pubDate : String?,
     @SerializedName("image_url") val imageUrl : String?,
-    @SerializedName("video_url") val videoUrl : String?
+    @SerializedName("video_url") val videoUrl : String?,
+
+    @SerializedName("source_name") val sourceName : String?,
+    @SerializedName("source_url") val sourceUrl : String?,
+    @SerializedName("source_icon") val sourceIcon : String?
 )
