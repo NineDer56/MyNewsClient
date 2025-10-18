@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">VkNews</string>
+
+    <string name="navigation_icon_home">Home</string>
+    <string name="navigation_icon_favourite">Favourite</string>
+    <string name="navigation_icon_profile">Profile</string>
+
+    <integer name="com_vk_sdk_AppId">54243612</integer>
+</resources>
