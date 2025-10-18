@@ -14,7 +14,6 @@ composeBom = "2025.10.00"
 loggingInterceptor = "5.2.1"
 materialIconsExtended = "1.7.8"
 navigationCompose = "2.9.5"
-sdkVersion = "2.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,9 +37,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "loggingInterceptor" }
-onetap-compose = { module = "com.vk.id:onetap-compose", version.ref = "sdkVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "converterGson" }
-vkid = { module = "com.vk.id:vkid", version.ref = "sdkVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

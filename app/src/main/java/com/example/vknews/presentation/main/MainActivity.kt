@@ -27,9 +27,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-
-
-
         setContent {
             VkNewsTheme {
                 val viewModel : MainViewModel = viewModel()
@@ -48,23 +45,6 @@ class MainActivity : ComponentActivity() {
                     }
 
                 }
-
-               // MainScreen()
-
-//                val viewModel : MainViewModel = viewModel()
-//                val authState = viewModel.authState.collectAsStateWithLifecycle()
-//
-//                when(authState.value){
-//                    is AuthState.Authorized -> {
-//                        MainScreen()
-//                    }
-//                    is AuthState.NotAuthorized -> {
-//                        AuthScreen(viewModel)
-//                    }
-//                    is AuthState.Initial -> {
-//                        viewModel.checkAuth()
-//                    }
-//                }
             }
 
         }
