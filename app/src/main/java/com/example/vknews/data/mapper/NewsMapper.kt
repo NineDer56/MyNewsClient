@@ -1,0 +1,31 @@
+package com.example.vknews.data.mapper
+
+import com.example.vknews.data.model.NewsResponseDto
+import com.example.vknews.data.model.NewsItemDto
+import com.example.vknews.domain.news.NewsResponse
+import com.example.vknews.domain.news.NewsItem
+
+class NewsMapper {
+
+    fun newsResponseDtoToEntity(dto: NewsResponseDto): NewsResponse {
+        return NewsResponse(
+            status = dto.status,
+            newsItems = dto.newsItems.map { resultDtoToEntity(it) },
+            nextPage = dto.nextPage
+        )
+    }
+
+    fun resultDtoToEntity(dto: NewsItemDto): NewsItem {
+        return NewsItem(
+            articleId = dto.articleId,
+            title = dto.title,
+            link = dto.link,
+            creator = dto.creator,
+            description = dto.description,
+            pubDate = dto.pubDate,
+            imageUrl = dto.imageUrl,
+            videoUrl = dto.videoUrl
+        )
+    }
+
+}
