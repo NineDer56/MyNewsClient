@@ -47,16 +47,20 @@ class NewsFeedViewModel : ViewModel() {
                         _newsState.value = NewsState.News(oldNews + newNews)
                     }
                 }
+                .onFailure {
+
+                }
         }
     }
+}
 
-    fun deleteNewsItem(post: NewsItem) {
-        val currentState = _newsState.value
-        if (currentState is NewsState.News) {
-            val old = currentState.news.toMutableList()
-            old.remove(post)
-            _newsState.value = NewsState.News(old)
-        }
+//    fun deleteNewsItem(post: NewsItem) {
+//        val currentState = _newsState.value
+//        if (currentState is NewsState.News) {
+//            val old = currentState.news.toMutableList()
+//            old.remove(post)
+//            _newsState.value = NewsState.News(old)
+//        }
 
 
 //    fun updateStatisticsItem(post: NewsItem, type: StatisticsType) {
@@ -89,7 +93,3 @@ class NewsFeedViewModel : ViewModel() {
 //            _newsFeedScreenState.value = NewsState.Posts(old)
 //        }
 //    }
-
-
-    }
-}

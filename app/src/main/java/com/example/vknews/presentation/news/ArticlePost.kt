@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -118,11 +119,16 @@ fun PostHead(
             )
         }
 
-        Icon(
-            imageVector = Icons.Rounded.MoreVert,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSecondary
-        )
+        IconButton(
+            onClick = {},
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.MoreVert,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSecondary,
+            )
+        }
     }
 }
 
