@@ -4,6 +4,7 @@ data class NewsItem(
     val articleId : String,
     val title : String,
     val link : String,
+    val keywords : List<String>,
     val creator : List<String>,
     val description : String,
     val pubDate : String,

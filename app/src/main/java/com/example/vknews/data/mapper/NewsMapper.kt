@@ -20,6 +20,7 @@ class NewsMapper {
             articleId = dto.articleId,
             title = dto.title ?: "",
             link = dto.link ?: "",
+            keywords = dto.keywords ?: emptyList(),
             creator = dto.creator ?: emptyList(),
             description = dto.description ?: "",
             pubDate = dto.pubDate ?: "",

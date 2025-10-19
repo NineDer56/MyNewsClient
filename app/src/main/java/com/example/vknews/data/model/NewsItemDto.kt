@@ -6,6 +6,7 @@ data class NewsItemDto(
     @SerializedName("article_id") val articleId : String,
     @SerializedName("title") val title : String?,
     @SerializedName("link") val link : String?,
+    @SerializedName("keywords") val keywords : List<String>?,
     @SerializedName("creator") val creator : List<String>?,
     @SerializedName("description") val description : String?,
     @SerializedName("pubDate") val pubDate : String?,
