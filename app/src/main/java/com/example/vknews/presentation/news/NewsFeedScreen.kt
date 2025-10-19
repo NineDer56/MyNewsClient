@@ -1,6 +1,7 @@
 package com.example.vknews.presentation.news
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.viewmodel.compose.viewModel
 
@@ -13,6 +14,10 @@ fun HomeScreen(
     val viewModel : NewsFeedViewModel = viewModel()
     val screenState = viewModel.newsState.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadNews()
+    }
+
     when(val currentState = screenState.value){
         is NewsState.News -> {
             FeedPosts(
@@ -23,7 +28,7 @@ fun HomeScreen(
         }
 
         is NewsState.Initial -> {
-            viewModel.loadNews()
+
         }
 
         is NewsState.Error -> {
