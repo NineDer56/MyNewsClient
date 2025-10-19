@@ -7,18 +7,6 @@ plugins {
     id("kotlin-parcelize")
 }
 
-val localProps = Properties().apply {
-    load(rootProject.file("local.properties").inputStream())
-}
-val vkClientId: String = requireNotNull(
-    // поддержим оба варианта ключей, на всякий случай
-    localProps.getProperty("VKIDClientID") ?: localProps.getProperty("VKIDClientId")
-) { "Missing VKIDClientId in local.properties" }
-
-val vkClientSecret: String = requireNotNull(
-    localProps.getProperty("VKIDClientSecret")
-) { "Missing VKIDClientSecret in local.properties" }
-
 
 android {
     namespace = "com.example.vknews"
@@ -32,16 +20,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        manifestPlaceholders.putAll(
-            mapOf(
-                "VKIDClientId" to vkClientId,
-                "VKIDClientID" to vkClientId,
-                "VKIDClientSecret" to vkClientSecret,
-                "VKIDRedirectHost" to "vk.ru",
-                "VKIDRedirectScheme" to "vk$vkClientId"
-            )
-        )
     }
 
     buildTypes {
@@ -62,6 +40,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    packaging {
+        resources {
+            pickFirsts += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+        }
     }
 }
 
@@ -92,9 +76,10 @@ dependencies {
 
     implementation(libs.coil.compose)
 
-    val sdkVersion = "2.5.1"
-    implementation("com.vk.id:vkid:${sdkVersion}")
-    implementation("com.vk.id:onetap-compose:${sdkVersion}")
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+    implementation(libs.logging.interceptor)
 
 
 }
