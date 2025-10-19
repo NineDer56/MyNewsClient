@@ -1,6 +1,7 @@
 package com.example.vknews.presentation.news
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,53 +27,66 @@ fun FeedPosts(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(posts, key = { it.articleId }) { newsItem ->
-            val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-                confirmValueChange = { value ->
-                    val isDismissed = value == SwipeToDismissBoxValue.EndToStart
-                    if (isDismissed) {
-                        viewModel.deleteNewsItem(newsItem)
-                    }
-                    return@rememberSwipeToDismissBoxState isDismissed
-                }
-            )
+        items(
+            count = posts.size,
+            key = { index -> posts[index].articleId}
+        ) { index ->
+
+            Log.d("LazyColumn", "postsize: ${posts.size}, index: $index")
+
+            if(posts.size - index <= 2){
+                viewModel.loadMoreNews()
+            }
+
+//            val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+//                confirmValueChange = { value ->
+//                    val isDismissed = value == SwipeToDismissBoxValue.EndToStart
+//                    if (isDismissed) {
+//                        viewModel.deleteNewsItem(posts[index])
+//                    }
+//                    return@rememberSwipeToDismissBoxState isDismissed
+//                }
+//            )
 
 
-            SwipeToDismissBox(
-                modifier = Modifier.animateItem(),
-                state = swipeToDismissBoxState,
-                enableDismissFromStartToEnd = false,
-                backgroundContent = {}
-            ) {
+//            SwipeToDismissBox(
+//                modifier = Modifier.animateItem(),
+//                state = swipeToDismissBoxState,
+//                enableDismissFromStartToEnd = false,
+//                backgroundContent = {}
+//            ) {
+//
+//            }
 
-                ArticlePost(
-                    newsItem = newsItem,
-                    onLikeClickListener = {
+
+            ArticlePost(
+                newsItem = posts[index],
+                onLikeClickListener = {
 //                        viewModel.updateStatisticsItem(
 //                            newsItem,
 //                            StatisticsType.LIKES
 //                        )
-                    },
-                    onCommentClickListener = {
+                },
+                onCommentClickListener = {
 //                        onCommentsClickListener(newsItem.id)
-                    },
-                    onRepostClickListener = {
+                },
+                onRepostClickListener = {
 //                        viewModel.updateStatisticsItem(
 //                            newsItem,
 //                            StatisticsType.REPOSTS
 //                        )
-                    },
-                    onViewClickListener = {
+                },
+                onViewClickListener = {
 //                        viewModel.updateStatisticsItem(
 //                            newsItem,
 //                            StatisticsType.VIEWS
 //                        )
-                    },
-                    onReadArticleClickListener = {
-                        context.startActivity(it)
-                    }
-                )
-            }
+                },
+                onReadArticleClickListener = {
+                    context.startActivity(it)
+                }
+            )
+
         }
 
     }
