@@ -1,5 +1,6 @@
 package com.example.vknews.presentation.news
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.vknews.domain.news.NewsItem
 
@@ -16,8 +18,10 @@ import com.example.vknews.domain.news.NewsItem
 fun FeedPosts(
     posts: List<NewsItem>,
     viewModel: NewsFeedViewModel,
-    onCommentsClickListener: (feedPostId: Int) -> Unit
+    onCommentsClickListener: (feedPostId: Int) -> Unit,
 ) {
+    val context = LocalContext.current
+
     LazyColumn(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -41,7 +45,7 @@ fun FeedPosts(
                 backgroundContent = {}
             ) {
 
-                VkPost(
+                ArticlePost(
                     newsItem = newsItem,
                     onLikeClickListener = {
 //                        viewModel.updateStatisticsItem(
@@ -63,6 +67,9 @@ fun FeedPosts(
 //                            newsItem,
 //                            StatisticsType.VIEWS
 //                        )
+                    },
+                    onReadArticleClickListener = {
+                        context.startActivity(it)
                     }
                 )
             }

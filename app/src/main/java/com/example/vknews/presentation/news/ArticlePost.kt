@@ -1,5 +1,6 @@
 package com.example.vknews.presentation.news
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -28,10 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import coil.compose.AsyncImage
 import com.example.vknews.R
 import com.example.vknews.domain.StatisticsItem
@@ -39,13 +43,14 @@ import com.example.vknews.domain.StatisticsType
 import com.example.vknews.domain.news.NewsItem
 
 @Composable
-fun VkPost(
+fun ArticlePost(
     modifier: Modifier = Modifier,
     newsItem: NewsItem,
     onLikeClickListener: (StatisticsItem) -> Unit,
     onCommentClickListener: (StatisticsItem) -> Unit,
     onRepostClickListener: (StatisticsItem) -> Unit,
-    onViewClickListener: (StatisticsItem) -> Unit
+    onViewClickListener: (StatisticsItem) -> Unit,
+    onReadArticleClickListener: (Intent) -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -56,9 +61,14 @@ fun VkPost(
     ) {
 
         PostHead(newsItem)
-        PostText(newsItem)
-        Spacer(modifier = Modifier.height(12.dp))
+        PostTitle(newsItem)
+        PostKeywords(newsItem)
         PostPicture(newsItem)
+        PostDescription(newsItem)
+        ReadArticle(
+            newsItem = newsItem,
+            onReadArticleClickListener = onReadArticleClickListener
+        )
         PostFooter(
             onLikeClickListener = onLikeClickListener,
             onCommentClickListener = onCommentClickListener,
@@ -78,7 +88,7 @@ fun PostHead(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .padding(start = 12.dp, end = 12.dp, top = 4.dp)
             .heightIn(64.dp, 64.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -117,12 +127,26 @@ fun PostHead(
 }
 
 @Composable
-fun PostText(
+fun PostKeywords(newsItem: NewsItem) {
+    if (newsItem.keywords.isNotEmpty()) {
+        Text(
+            text = newsItem.keywords.joinToString(),
+            fontSize = 14.sp,
+            color = MaterialTheme.colorScheme.onSecondary,
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+        )
+    }
+}
+
+@Composable
+fun PostTitle(
     newsItem: NewsItem
 ) {
     Log.d("recomposition", "PostText")
     Text(
         text = newsItem.title,
+        fontSize = 18.sp,
         modifier = Modifier
             .padding(horizontal = 12.dp)
     )
@@ -132,16 +156,50 @@ fun PostText(
 fun PostPicture(
     newsItem: NewsItem
 ) {
-    Log.d("recomposition", "PostPicture")
-    AsyncImage(
-        model = newsItem.imageUrl.takeIf { it.isNotBlank() },
-        contentDescription = null,
-        contentScale = ContentScale.FillWidth,
+    if(newsItem.imageUrl.isNotBlank()){
+        Spacer(modifier = Modifier.height(4.dp))
+        AsyncImage(
+            model = newsItem.imageUrl.takeIf { it.isNotBlank() },
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+
+}
+
+@Composable
+fun PostDescription(newsItem: NewsItem) {
+    if(newsItem.description.isNotBlank()){
+        Text(
+            text = newsItem.description,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+    }
+}
+
+
+@Composable
+fun ReadArticle(newsItem: NewsItem, onReadArticleClickListener: (Intent) -> Unit) {
+    Text(
+        text = stringResource(R.string.read_article),
+        fontSize = 14.sp,
+        color = MaterialTheme.colorScheme.onTertiary,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 12.dp)
+            .clickable(
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, newsItem.link.toUri())
+                    onReadArticleClickListener(intent)
+                }
+            )
     )
 }
+
 
 @Composable
 fun PostFooter(
@@ -159,7 +217,7 @@ fun PostFooter(
     )
     Row(
         modifier = Modifier
-            .padding(horizontal = 12.dp, vertical = 12.dp)
+            .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -231,4 +289,32 @@ fun IconWithCountRow(
             color = MaterialTheme.colorScheme.onSecondary
         )
     }
+}
+
+
+@Preview
+@Composable
+fun PreviewArticlePost() {
+    ArticlePost(
+        modifier = Modifier.padding(8.dp),
+        newsItem = NewsItem(
+            articleId = "312321",
+            title = "Go Back to the Shadow! UK Professor Claims Tolkien's Lord of the Rings 'Demonizes' People of Color",
+            link = "https://twitchy.com/grateful-calvin/2025/10/17/tolkiens-lord-of-the-rings-demonizes-people-of-color-n2420498",
+            keywords = listOf("english", "data", "it"),
+            creator = listOf("Топор"),
+            description = "slfjlsdjfksdjflksdflsdjlkdsj jsdflk jsdlk jsdlk jsdlkj sdlkfjslkdj flsdf lksdnlks nbljrwpijepirqpo lkdsn ",
+            pubDate = "2025-10-17 22:00:00",
+            imageUrl = "https://media.townhall.com/cdn/hodl/tw/images/up/2024/331/5bb3b0d6-b72e-4248-aa49-78d6ccf50e33.PNG",
+            videoUrl = "",
+            sourceName = "Twitchy",
+            sourceUrl = "https://twitchy.com",
+            sourceIcon = "https://n.bytvi.com/twitchy.png"
+        ),
+        onLikeClickListener = {},
+        onRepostClickListener = {},
+        onViewClickListener = {},
+        onCommentClickListener = {},
+        onReadArticleClickListener = {}
+    )
 }
