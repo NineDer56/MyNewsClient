@@ -20,6 +20,7 @@ class NewsFeedViewModel : ViewModel() {
     private val getLatestNewsUseCase = GetLatestNewsUseCase(repository)
 
     fun loadNews() {
+        _newsState.value = NewsState.Loading
         viewModelScope.launch {
             getLatestNewsUseCase()
                 .onSuccess {
