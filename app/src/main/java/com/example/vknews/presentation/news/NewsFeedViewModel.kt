@@ -6,6 +6,7 @@ import com.example.vknews.data.repository.NewsRepositoryImpl
 import com.example.vknews.domain.news.NewsItem
 import com.example.vknews.domain.usecase.GetLatestNewsUseCase
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,13 +19,8 @@ class NewsFeedViewModel : ViewModel() {
     private val repository = NewsRepositoryImpl()
     private val getLatestNewsUseCase = GetLatestNewsUseCase(repository)
 
-    private var loadJob: Job? = null
-    private var loadMoreJob: Job? = null
-
     fun loadNews() {
-        if (loadJob?.isActive == true || loadMoreJob?.isActive == true) return
-
-        loadJob = viewModelScope.launch {
+        viewModelScope.launch {
             getLatestNewsUseCase()
                 .onSuccess {
                     _newsState.value = NewsState.News(it)
@@ -36,19 +32,21 @@ class NewsFeedViewModel : ViewModel() {
     }
 
     fun loadMoreNews() {
-        if (loadJob?.isActive == true || loadMoreJob?.isActive == true) return
+        val snapshot = _newsState.value as? NewsState.News ?: return
+        if(snapshot.isLoadingMore) return
 
-        loadMoreJob = viewModelScope.launch {
+        viewModelScope.launch {
+            _newsState.value = snapshot.copy(isLoadingMore = true)
             getLatestNewsUseCase()
                 .onSuccess { newNews ->
-                    val currentState = _newsState.value
-                    if (currentState is NewsState.News) {
-                        val oldNews = currentState.news
-                        _newsState.value = NewsState.News(oldNews + newNews)
-                    }
+                    val mergedItems = snapshot.news + newNews
+                    _newsState.value = snapshot.copy(
+                        news = mergedItems,
+                        isLoadingMore = false
+                    )
                 }
                 .onFailure {
-
+                    _newsState.value = snapshot.copy(isLoadingMore = false)
                 }
         }
     }

@@ -23,7 +23,8 @@ fun HomeScreen(
             FeedPosts(
                 posts = currentState.news,
                 viewModel = viewModel,
-                onCommentsClickListener = onCommentsClickListener
+                onCommentsClickListener = onCommentsClickListener,
+                isLoadingMore = currentState.isLoadingMore
             )
         }
 
