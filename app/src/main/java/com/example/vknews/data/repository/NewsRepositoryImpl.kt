@@ -5,13 +5,16 @@ import com.example.vknews.data.network.ApiFactory
 import com.example.vknews.domain.news.NewsItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -25,7 +28,7 @@ class NewsRepositoryImpl {
 
     private var currentPage: String? = null
 
-    private val _news = mutableListOf<NewsItem>()
+    private var _news = mutableListOf<NewsItem>()
 
     private val loadNextNewsEvent = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1
@@ -47,10 +50,15 @@ class NewsRepositoryImpl {
                 val snapshot = mutex.withLock {
                     currentPage = response.nextPage
                     _news.addAll(mapped)
-                    _news
+                    _news = _news.distinctBy { it.articleId }.toMutableList()
+                    _news.toList()
                 }
 
                 snapshot
+            }
+            .retry() {
+                delay(2000L)
+                true
             }
 
     suspend fun loadNextNews() {
