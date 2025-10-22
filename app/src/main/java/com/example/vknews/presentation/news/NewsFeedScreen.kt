@@ -18,11 +18,7 @@ fun HomeScreen(
 ){
 
     val viewModel : NewsFeedViewModel = viewModel()
-    val screenState = viewModel.newsState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadNews()
-    }
+    val screenState = viewModel.newsState.collectAsState(NewsState.Initial)
 
     when(val currentState = screenState.value){
         is NewsState.News -> {
