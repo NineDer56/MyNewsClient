@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("kotlin-parcelize")
+    id("kotlin-kapt")
 }
 
 
@@ -81,5 +82,9 @@ dependencies {
 
     implementation(libs.logging.interceptor)
 
+    implementation (libs.dagger.android)
+    implementation (libs.dagger.android.support)
+    kapt (libs.dagger.android.processor)
+    kapt (libs.dagger.compiler)
 
 }
