@@ -1,7 +1,7 @@
 package com.example.vknews.data.repository
 
 import com.example.vknews.data.mapper.NewsMapper
-import com.example.vknews.data.network.ApiFactory
+import com.example.vknews.data.network.ApiService
 import com.example.vknews.domain.news.NewsItem
 import com.example.vknews.domain.repository.NewsRepository
 import kotlinx.coroutines.Dispatchers
@@ -14,15 +14,15 @@ import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class NewsRepositoryImpl : NewsRepository{
-
-    private val apiService = ApiFactory().apiService
-    private val mapper = NewsMapper()
-    private val mutex = Mutex()
+class NewsRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val mapper: NewsMapper,
+    private val mutex: Mutex
+) : NewsRepository {
 
     private var currentPage: String? = null
-
     private var _news = mutableListOf<NewsItem>()
 
     private val loadNextNewsEvent = MutableSharedFlow<Unit>(
@@ -64,7 +64,7 @@ class NewsRepositoryImpl : NewsRepository{
         loadNextNewsEvent.emit(Unit)
     }
 
-    override suspend fun getSnapshot() : List<NewsItem> = mutex.withLock { _news.toList() }
+    override suspend fun getSnapshot(): List<NewsItem> = mutex.withLock { _news.toList() }
 
 
 //    private val loadNextNewsFlow = flow {

@@ -3,7 +3,6 @@ package com.example.vknews.presentation.news
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vknews.data.repository.NewsRepositoryImpl
 import com.example.vknews.domain.usecase.GetLatestNewsUseCase
 import com.example.vknews.domain.usecase.GetSnapshotUseCase
 import com.example.vknews.domain.usecase.LoadNextNewsUseCase
@@ -17,14 +16,14 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewsFeedViewModel : ViewModel() {
+class NewsFeedViewModel @Inject constructor(
+    private val getLatestNewsUseCase: GetLatestNewsUseCase,
+    private val getSnapshotUseCase: GetSnapshotUseCase,
+    private val loadNextNewsUseCase: LoadNextNewsUseCase
+) : ViewModel() {
 
-    private val repository = NewsRepositoryImpl()
-
-    private val getLatestNewsUseCase = GetLatestNewsUseCase(repository)
-    private val getSnapshotUseCase = GetSnapshotUseCase(repository)
-    private val loadNextNewsUseCase = LoadNextNewsUseCase(repository)
 
     private val loadNextDataEvent = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1
@@ -64,7 +63,7 @@ class NewsFeedViewModel : ViewModel() {
             loadNextDataEvent.emit(Unit)
             loadNextNewsUseCase()
         }
-    }
+}
 }
 
 

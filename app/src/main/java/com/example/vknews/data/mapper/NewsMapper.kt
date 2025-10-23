@@ -4,8 +4,9 @@ import com.example.vknews.data.model.NewsItemDto
 import com.example.vknews.data.model.NewsResponseDto
 import com.example.vknews.domain.news.NewsItem
 import com.example.vknews.domain.news.NewsResponse
+import javax.inject.Inject
 
-class NewsMapper {
+class NewsMapper @Inject constructor(){
 
     fun newsResponseDtoToEntity(dto: NewsResponseDto): NewsResponse {
         return NewsResponse(
