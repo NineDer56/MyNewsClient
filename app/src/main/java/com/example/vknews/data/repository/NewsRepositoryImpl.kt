@@ -1,40 +1,35 @@
 package com.example.vknews.data.repository
 
 import com.example.vknews.data.mapper.NewsMapper
-import com.example.vknews.data.network.ApiFactory
+import com.example.vknews.data.network.ApiService
 import com.example.vknews.domain.news.NewsItem
-import kotlinx.coroutines.CoroutineScope
+import com.example.vknews.domain.repository.NewsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class NewsRepositoryImpl {
-
-    private val apiService = ApiFactory().apiService
-    private val mapper = NewsMapper()
-    private val mutex = Mutex()
+class NewsRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val mapper: NewsMapper,
+    private val mutex: Mutex
+) : NewsRepository {
 
     private var currentPage: String? = null
-
     private var _news = mutableListOf<NewsItem>()
 
     private val loadNextNewsEvent = MutableSharedFlow<Unit>(
         extraBufferCapacity = 1
     )
 
-    val latestNews: Flow<List<NewsItem>> =
+    private val latestNews: Flow<List<NewsItem>> =
         loadNextNewsEvent
             .onStart { emit(Unit) }
             .map {
@@ -61,11 +56,15 @@ class NewsRepositoryImpl {
                 true
             }
 
-    suspend fun loadNextNews() {
+    override fun getLatestNewsFlow(): Flow<List<NewsItem>> {
+        return latestNews
+    }
+
+    override suspend fun loadNextNews() {
         loadNextNewsEvent.emit(Unit)
     }
 
-    suspend fun snapshot() : List<NewsItem> = mutex.withLock { _news.toList() }
+    override suspend fun getSnapshot(): List<NewsItem> = mutex.withLock { _news.toList() }
 
 
 //    private val loadNextNewsFlow = flow {

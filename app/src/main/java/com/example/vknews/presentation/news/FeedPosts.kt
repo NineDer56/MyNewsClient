@@ -17,15 +17,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.vknews.di.ViewModelFactory
 import com.example.vknews.domain.news.NewsItem
 
 @Composable
 fun FeedPosts(
     posts: List<NewsItem>,
-    viewModel: NewsFeedViewModel,
+    viewModelFactory: ViewModelFactory,
     isLoadingMore : Boolean,
     onCommentsClickListener: (feedPostId: Int) -> Unit,
 ) {
+    val viewModel : NewsFeedViewModel = viewModel(factory = viewModelFactory)
     val context = LocalContext.current
 
     LazyColumn(

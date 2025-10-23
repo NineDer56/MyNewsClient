@@ -5,5 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface NewsRepository {
 
-    fun getLatestNews() : Flow<List<NewsItem>>
+    fun getLatestNewsFlow() : Flow<List<NewsItem>>
+
+    suspend fun loadNextNews()
+
+    suspend fun getSnapshot() : List<NewsItem>
 }

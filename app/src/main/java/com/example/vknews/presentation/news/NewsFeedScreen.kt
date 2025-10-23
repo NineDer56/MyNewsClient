@@ -14,21 +14,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.vknews.di.ViewModelFactory
 
 
 @Composable
 fun HomeScreen(
+    viewModelFactory: ViewModelFactory,
     onCommentsClickListener: (feedPostId: Int) -> Unit
 ){
 
-    val viewModel : NewsFeedViewModel = viewModel()
+    val viewModel : NewsFeedViewModel = viewModel(factory = viewModelFactory)
     val screenState = viewModel.newsState.collectAsState(NewsState.Initial)
 
     when(val currentState = screenState.value){
         is NewsState.News -> {
             FeedPosts(
                 posts = currentState.news,
-                viewModel = viewModel,
+                viewModelFactory = viewModelFactory,
                 onCommentsClickListener = onCommentsClickListener,
                 isLoadingMore = currentState.isLoadingMore
             )
