@@ -1,5 +1,6 @@
 package com.example.vknews.domain.news
 
+// @Immutable ставим если объект будет передаваться как аргумент в графе, чтобы можно было устанвоить равенство объектов
 data class NewsItem(
     val articleId : String,
     val title : String,

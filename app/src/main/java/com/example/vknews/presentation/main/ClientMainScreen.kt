@@ -29,9 +29,7 @@ import com.example.vknews.presentation.news.NewsFeedViewModel
 
 
 @Composable
-fun MainScreen(
-    viewModelFactory : ViewModelFactory
-) {
+fun MainScreen() {
     val navigationState = rememberNavigationState()
 
     val icons = listOf(
@@ -82,7 +80,6 @@ fun MainScreen(
             navController = navigationState.navHostController,
             newsFeedContent = {
                 HomeScreen(
-                    viewModelFactory = viewModelFactory,
                     onCommentsClickListener = {
                         //navigationState.navigateToComments(it)
                     }
