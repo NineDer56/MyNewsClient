@@ -1,95 +1,72 @@
 package com.example.vknews.presentation.news
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vknews.data.repository.NewsRepositoryImpl
-import com.example.vknews.domain.news.NewsItem
 import com.example.vknews.domain.usecase.GetLatestNewsUseCase
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.example.vknews.domain.usecase.GetSnapshotUseCase
+import com.example.vknews.domain.usecase.LoadNextNewsUseCase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NewsFeedViewModel : ViewModel() {
+class NewsFeedViewModel @Inject constructor(
+    private val getLatestNewsUseCase: GetLatestNewsUseCase,
+    private val getSnapshotUseCase: GetSnapshotUseCase,
+    private val loadNextNewsUseCase: LoadNextNewsUseCase
+) : ViewModel() {
 
-    private val _newsState = MutableStateFlow<NewsState>(NewsState.Initial)
-    val newsState = _newsState.asStateFlow()
 
-    private val repository = NewsRepositoryImpl()
-    private val getLatestNewsUseCase = GetLatestNewsUseCase(repository)
+    private val loadNextDataEvent = MutableSharedFlow<Unit>(
+        extraBufferCapacity = 1
+    )
 
-    private var loadJob: Job? = null
-    private var loadMoreJob: Job? = null
+    val newsState: StateFlow<NewsState> =
+        merge(
+            getLatestNewsUseCase().map {
+                NewsState.News(
+                    news = it,
+                    isLoadingMore = false
+                ) as NewsState
+            },
+            loadNextDataEvent.map {
+                NewsState.News(
+                    news = getSnapshotUseCase(),
+                    isLoadingMore = true
+                ) as NewsState
+            }
+        )
+            .catch { e ->
+                Log.d("NewsFeedViewModel", e.message ?: "Unknown error")
+            }
+            .onStart {
+                emit(NewsState.Loading)
+                loadNextNewsUseCase()
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = NewsState.Initial
+            )
 
-    fun loadNews() {
-        if (loadJob?.isActive == true || loadMoreJob?.isActive == true) return
-
-        loadJob = viewModelScope.launch {
-            getLatestNewsUseCase()
-                .onSuccess {
-                    _newsState.value = NewsState.News(it)
-                }
-                .onFailure {
-                    _newsState.value = NewsState.Error(it.message ?: "message is null")
-                }
-        }
-    }
 
     fun loadMoreNews() {
-        if (loadJob?.isActive == true || loadMoreJob?.isActive == true) return
-
-        loadMoreJob = viewModelScope.launch {
-            getLatestNewsUseCase()
-                .onSuccess { newNews ->
-                    val currentState = _newsState.value
-                    if (currentState is NewsState.News) {
-                        val oldNews = currentState.news
-                        _newsState.value = NewsState.News(oldNews + newNews)
-                    }
-                }
-                .onFailure {
-
-                }
+        viewModelScope.launch {
+            loadNextDataEvent.emit(Unit)
+            loadNextNewsUseCase()
         }
-    }
+}
 }
 
-//    fun deleteNewsItem(post: NewsItem) {
-//        val currentState = _newsState.value
-//        if (currentState is NewsState.News) {
-//            val old = currentState.news.toMutableList()
-//            old.remove(post)
-//            _newsState.value = NewsState.News(old)
-//        }
 
-
-//    fun updateStatisticsItem(post: NewsItem, type: StatisticsType) {
-//        val currentState = _newsState.value
-//        if(currentState is NewsState.News){
-//            val old = currentState.news.toMutableList()
-//            old.apply {
-//                replaceAll { oldPost ->
-//                    if (oldPost.articleId == post.articleId) {
-//
-//                        val newPost = oldPost.copy(
-//                            statistics = oldPost.statistics.toMutableList().apply {
-//                                replaceAll { oldItem ->
-//                                    if (oldItem.type == type) {
-//                                        oldItem.copy(count = oldItem.count + 1)
-//                                    } else {
-//                                        oldItem
-//                                    }
-//                                }
-//                            }
-//                        )
-//                        Log.d("update", newPost.statistics.toString())
-//                        newPost
-//                    } else {
-//                        oldPost
-//                    }
-//                }
-//            }
-//
-//            _newsFeedScreenState.value = NewsState.Posts(old)
-//        }
-//    }
+private fun <T> Flow<T>.merge(another: Flow<T>): Flow<T> {
+    return merge(this, another)
+}

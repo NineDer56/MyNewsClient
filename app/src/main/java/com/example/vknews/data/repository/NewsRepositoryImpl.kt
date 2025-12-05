@@ -1,30 +1,90 @@
 package com.example.vknews.data.repository
 
-import android.util.Log
 import com.example.vknews.data.mapper.NewsMapper
-import com.example.vknews.data.network.ApiFactory
+import com.example.vknews.data.network.ApiService
 import com.example.vknews.domain.news.NewsItem
 import com.example.vknews.domain.repository.NewsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class NewsRepositoryImpl : NewsRepository {
-
-    private val apiService = ApiFactory().apiService
-    private val mapper = NewsMapper()
+class NewsRepositoryImpl @Inject constructor(
+    private val apiService: ApiService,
+    private val mapper: NewsMapper,
+    private val mutex: Mutex
+) : NewsRepository {
 
     private var currentPage: String? = null
+    private var _news = mutableListOf<NewsItem>()
 
-    override suspend fun getLatestNews(): Result<List<NewsItem>> {
+    private val loadNextNewsEvent = MutableSharedFlow<Unit>(
+        extraBufferCapacity = 1
+    )
 
-        return runCatching {
-            val response = apiService.getLatestNews(currentPage)
-            currentPage = response.nextPage
-            Log.d("OkHttp", currentPage.toString())
+    private val latestNews: Flow<List<NewsItem>> =
+        loadNextNewsEvent
+            .onStart { emit(Unit) }
+            .map {
+                val page = mutex.withLock { currentPage }
 
-            val results = response.newsItems
-                .map {
-                    mapper.resultDtoToEntity(it)
+                val response = withContext(Dispatchers.IO) {
+                    apiService.getLatestNews(page)
                 }
-            results
-        }
+
+                val mapped = response.newsItems
+                    .map { mapper.resultDtoToEntity(it) }
+
+                val snapshot = mutex.withLock {
+                    currentPage = response.nextPage
+                    _news.addAll(mapped)
+                    _news = _news.distinctBy { it.articleId }.toMutableList()
+                    _news.toList()
+                }
+
+                snapshot
+            }
+            .retry() {
+                delay(2000L)
+                true
+            }
+
+    override fun getLatestNewsFlow(): Flow<List<NewsItem>> {
+        return latestNews
     }
+
+    override suspend fun loadNextNews() {
+        loadNextNewsEvent.emit(Unit)
+    }
+
+    override suspend fun getSnapshot(): List<NewsItem> = mutex.withLock { _news.toList() }
+
+
+//    private val loadNextNewsFlow = flow {
+//        loadNextNewsEvent.emit(Unit)
+//        loadNextNewsEvent.collect {
+//            val response = apiService.getLatestNews(currentPage)
+//            currentPage = response.nextPage
+//
+//            val results = response.newsItems
+//                .map {
+//                    mapper.resultDtoToEntity(it)
+//                }
+//            _news.addAll(results)
+//            emit(news)
+//        }
+//    }
+
+//.stateIn(
+//            scope = coroutineScope,
+//            started = SharingStarted.Lazily,
+//            initialValue = emptyList()
+//        )
 }

@@ -20,10 +20,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.vknews.di.ViewModelFactory
 import com.example.vknews.navigation.AppNavGraph
 import com.example.vknews.navigation.rememberNavigationState
 import com.example.vknews.presentation.comments.CommentScreen
 import com.example.vknews.presentation.news.HomeScreen
+import com.example.vknews.presentation.news.NewsFeedViewModel
 
 
 @Composable
